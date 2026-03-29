@@ -8,7 +8,7 @@ Low-latitude environmental regularity sustains non-photic entrainment in blind a
 
 The pipeline is organized into three main modules:
 
-1. geographical_and_seasonal_context_of_study_participants  
+1. Geographical_and_seasonal_context_of_study_participants  
 2. Nonparametric_actigraphy_feature_extraction  
 3. Nonparametric_actigraphy_clustering 
 
