@@ -1,209 +1,333 @@
+# 🌀 Nonparametric Actigraphy Clustering
 
-This repository contains three integrated workflows for analyzing circadian rhythms, actigraphy data, and environmental context in human participants.
+A modular Python pipeline for **extracting, contextualising, and clustering** circadian and sleep features from wrist actigraphy data. Developed for a study of blind adults living near the equator in Brazil, and readily adaptable to other actigraphy datasets.
 
-These workflows were developed and used in the study:
-
-**Pugliane, K. C., França, L. G. S., Leocadio-Miguel, M., & Araújo, J. F. (2026).  
-Low-latitude environmental regularity sustains non-photic entrainment in blind adults.**
-
-The pipeline is organized into three main modules:
-
-1. Geographical_and_seasonal_context_of_study_participants  
-2. Nonparametric_actigraphy_feature_extraction  
-3. Nonparametric_actigraphy_clustering 
-
----
-# 0 Input Data & Environment Setup
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18922404.svg)](https://doi.org/10.5281/zenodo.18922404)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Pugliane/nonparametric-actigraphy-clustering/blob/main/nonparametric_actigraphy_clustering.ipynb)
+[![bioRxiv](https://img.shields.io/badge/bioRxiv-2026.03.19.712663-b31b1b)](https://doi.org/10.64898/2026.03.19.712663)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 
 ---
 
-## Environment Setup
+## 📖 About
 
-### 0.1. Create a virtual environment
+This repository contains three integrated Jupyter notebooks developed for the study:
 
-```bash
-python -m venv venv
-```
+> **Pugliane, K. C., França, L. G. S., Leocadio-Miguel, M., & Araújo, J. F. (2026).**  
+> *Low-latitude environmental regularity sustains non-photic entrainment in blind adults.*  
+> bioRxiv. https://doi.org/10.64898/2026.03.19.712663
 
-This creates a folder called `venv/` containing an isolated Python environment.
+The pipeline moves from **geospatial and environmental context** → **actigraphy feature extraction** → **unsupervised clustering with SHAP-based explainability**, producing publication-ready figures and statistical outputs throughout.
 
----
-
-### 0.2. Activate the environment
-
-**Linux / Mac**
-
-```bash
-source venv/bin/activate
-```
-
-**Windows**
-
-```bash
-venv\Scripts\activate
-```
-
-Once activated, your terminal should display `(venv)`.
+![Key results figure](Highlights_RA_IS_QPActivity_LRI_L5_layout221.png)
 
 ---
 
-### 0.3. Install dependencies
+## 🔬 Study Overview
 
-```bash
-pip install -r requirements.txt
-```
+Most research on circadian rhythms in blind individuals has been conducted at high latitudes (North America, Europe), where pronounced seasonal variation in photoperiod may compound the loss of photic input. This study asked whether the exceptionally stable environmental conditions near the equator (~5°S, Rio Grande do Norte, Brazil) could sustain circadian entrainment even in the absence of light perception.
 
-This is where the `requirements.txt` file is used to install all required packages.
+**58 blind adults** (21–77 years; 43.1% female) wore wrist actigraphy continuously for **four weeks**. Pupillary light reflex (PLR) was used as a proxy for intact ipRGC photoreception (22 reactive, 36 non-reactive). A semi-supervised machine learning approach — combining PCA, KMeans clustering, and SHAP feature importance — was applied to 23 nonparametric actigraphy variables.
 
-##  Input Data Format
+Two distinct circadian phenotypes emerged:
 
-The script expects a tabular dataset (CSV or Excel), where each row represents one participant.
+| Phenotype | n | % | Key features |
+|-----------|---|---|--------------|
+| 🟢 **Higher Circadian Stability (HCS)** | 42 | 72% | High RA, IS, QPActivity, LRI; consolidated rhythms |
+| 🔴 **Lower Circadian Stability (LCS)** | 16 | 28% | Fragmented rhythms, lower regularity and amplitude |
 
----
-
-# 1.0 Geographical and Seasonal Context of Study Participants
-
-This repository contains scripts and notebooks for generating publication-ready figures describing the geographical and environmental context of study participants in Rio Grande do Norte, Brazil.
-
-The workflow integrates geospatial data, photoperiod estimation, and temperature data from NASA POWER.
+Notably, **64% of PLR-non-reactive individuals** (23 of 36) fell in the HCS group — approximately **1.6× higher** than previously reported for blind cohorts at higher latitudes. Cluster membership explained substantially more variance in circadian metrics than PLR status alone (e.g., RA: R² = 0.61 for cluster vs. R² = 0.15 for PLR).
 
 ---
 
-## Overview
+## 🗂️ Pipeline Overview
 
-This project produces a composite figure including:
-
-- **Panel A**: Location of Rio Grande do Norte within Brazil  
-- **Panel B**: Municipal divisions of Rio Grande do Norte (highlighting Natal)  
-- **Panel C**: Seasonal variation in photoperiod  
-- **Panel D**: Seasonal variation in temperature  
-
+| # | Notebook | Description |
+|---|----------|-------------|
+| 1 | `geographical_and_seasonal_context_of_study_participants.ipynb` | Maps participant location (Rio Grande do Norte, Brazil), estimates photoperiod using `astral`, and retrieves NASA POWER temperature/radiation data |
+| 2 | `nonparametric_actigraphy_feature_extraction.ipynb` | Loads actigraphy files, applies manually defined off-wrist masks, and extracts nonparametric circadian/sleep variables using `pyActigraphy` |
+| 3 | `nonparametric_actigraphy_clustering.ipynb` | Z-score normalisation → multicollinearity screening → PCA → KMeans clustering → Random Forest + SHAP feature importance → between-group comparisons and regression |
 
 ---
-# 2.0 Nonparametric Actigraphy Feature Extraction
 
-This repository contains the workflow used to extract non-parametric circadian and sleep-related variables from actigraphy recordings using `pyActigraphy`.
+## ✨ Features
 
-The script processes multiple actigraphy text files, applies manually defined off-wrist masks, computes activity- and light-based metrics, and exports the results to Excel and CSV files for downstream analyses.
+- 🗺️ **Geospatial figures** — maps of Brazil and Rio Grande do Norte with participant location, using `geopandas` and `geobr`
+- ☀️ **Photoperiod & temperature panels** — seasonal variation estimated from `astral` + NASA POWER API
+- 🏃 **Actigraphy feature extraction** — 24 nonparametric metrics via `pyActigraphy`, with manual off-wrist masking applied per participant
+- 🧬 **Multiple circadian domains** — activity, light, temperature, and sleep-derived variables
+- 🤖 **Unsupervised clustering** — PCA dimensionality reduction + KMeans with silhouette-based optimisation (k = 2–10 evaluated)
+- 🔍 **Explainability** — SHAP values (via Random Forest classifier) identify which features most distinguish each cluster
+- 📊 **Publication-ready outputs** — figures, Excel/CSV exports, regression tables
 
-## Overview
+---
 
-The workflow performs the following steps:
+## 📚 Data Dictionary
 
-1. Loads manually curated off-wrist mask information
-2. Reads actigraphy files (`*_LogTAT_conferido.txt`)
-3. Matches each file to its corresponding mask intervals
-4. Applies activity and light masks
-5. Computes circadian, sleep, and light-related variables
-6. Exports the extracted dataset
-7. Performs post-processing of participant metadata and selected time variables
+All metrics below are extracted from wrist actigraphy using `pyActigraphy`. The device (ActTrust 1, Condor Instruments) records activity, ambient light, and skin temperature.
 
-## Main Outputs
+### Stability
 
-The workflow generates:
+| Variable | Abbreviation | Description | Reference |
+|----------|-------------|-------------|-----------|
+| Interdaily Stability | **IS** | Regularity and synchronisation of the activity pattern with the 24-h light–dark cycle across days; higher = more stable | Witting et al., 1990 |
+| Sleep Regularity Index | **SRI** | Day-to-day consistency of sleep–wake timing; higher = more regular | Sletten et al., 2023 |
 
-- `Basic_extraction_oficial.xlsx`
-- `Basic_extraction_oficial.csv`
-- `Basic_extraction_official_groups.xlsx`
-- `Basic_extraction_oficial_grupos_modified_minutes.xlsx`
+### Fragmentation
 
-## Extracted Variables
+| Variable | Abbreviation | Description | Reference |
+|----------|-------------|-------------|-----------|
+| Intradaily Variability | **IV** | Frequency of transitions between rest and activity; higher = more fragmented | Witting et al., 1990 |
+| Rest-to-Activity probability | **kRA** | Probability of switching from rest to activity | Lim et al., 2011 |
+| Activity-to-Rest probability | **kAR** | Probability of switching from activity to rest | Lim et al., 2011 |
+| Fraction of Sleep over Daytime | **FSoD** | Proportion of daytime epochs classified as sleep; higher = more daytime sleep | David et al., 2022 |
 
-Examples of extracted variables include:
+### Amplitude
 
-- Relative Amplitude (RA)
-- Interdaily Stability (IS)
-- Intradaily Variability (IV)
-- M10 and L5
-- M10 onset and L5 onset
-- Sleep Midpoint
-- Activity Onset and Offset
-- Sleep Regularity Index (SRI)
-- Centre of Gravity (CoG)
-- Average Daily Activity Total (ADAT)
-- Fraction of Sleep over Daytime (FSoD)
-- Rest-to-Activity and Activity-to-Rest transition probabilities
-- Light Regularity Index (LRI)
+| Variable | Abbreviation | Description | Reference |
+|----------|-------------|-------------|-----------|
+| Relative Amplitude | **RA** | Contrast between the most active 10-h period (M10) and least active 5-h period (L5); range 0–1, higher = greater amplitude | Van Someren et al., 1999 |
+| Most Active 10-h Mean | **M10** | Mean activity level during the 10 most active consecutive hours | Gonçalves et al., 2015 |
+| Least Active 5-h Mean | **L5** | Mean activity level during the 5 least active consecutive hours | Gonçalves et al., 2015 |
+| Average Daily Activity Total | **ADAT** | Overall mean daily activity level | Buchman et al., 2012 |
 
-## Input Files
+### Phase Markers
 
-The workflow expects:
+| Variable | Abbreviation | Description | Reference |
+|----------|-------------|-------------|-----------|
+| Sleep Midpoint | **SleepMidpoint** | Average clock time of the midpoint of the main sleep episode (minutes from midnight) | Forbes et al., 2012 |
+| M10 Onset | **M10o** | Clock time marking the start of the 10-h most active window (minutes from midnight) | Boudebesse et al., 2014 |
+| L5 Onset | **L5o** | Clock time marking the start of the 5-h least active window (minutes from midnight) | Boudebesse et al., 2014 |
+| Center of Gravity | **CoG** | Average timing of activity accumulation; a phase orientation marker (hours) | Kenagy, 1980 |
 
-- actigraphy text files matching the pattern:
-  `*LogTAT_conferido.txt`
-- a manual mask database in CSV format
-- an intermediate Excel file generated by the first extraction step
+### Light Exposure
 
-You should update file paths in the script before running it.
+| Variable | Abbreviation | Description | Reference |
+|----------|-------------|-------------|-----------|
+| Light Regularity Index | **LRI** | Day-to-day regularity of light exposure patterns; higher = more regular | Hand et al., 2023 |
+| M10 Onset (light) | **M10olight** | Clock time marking the onset of maximum 10-h light exposure (minutes from midnight) | Hammad et al., 2024 |
+| L5 Onset (light) | **L5olight** | Clock time marking the onset of minimum 5-h light exposure (minutes from midnight) | Hammad et al., 2024 |
 
-# 3.0 Nonparametric Actigraphy Clustering
+### Frequency Domain (Activity, Light & Temperature)
 
-###  Required Columns
+| Variable | Abbreviation | Description | Reference |
+|----------|-------------|-------------|-----------|
+| QP Statistic | **QPActivity / QPLight / QPTemperature** | Rhythm prominence (strength) based on the chi-square periodogram; higher = stronger rhythm | Sokolove & Bushell, 1978 |
+| Period Estimate | **PeriodActivity / PeriodLight / PeriodTemperature** | Period length (minutes) corresponding to the dominant QP peak | Sokolove & Bushell, 1978 |
+
+> **Note on variable exclusion:** AUC (area under the activity curve) was computed but excluded prior to clustering due to high redundancy with ADAT (Pearson r > 0.85, VIF > 5.0). The final clustering used 23 variables.
+
+---
+
+## 📥 Input Data Format
+
+The clustering notebook (notebook 3) expects a **CSV or Excel file** where each row represents one participant.
+
+### Required metadata columns
 
 ```text
 Participant, Sex, Age, PLR, Diabetes status, Light Perception
 ```
 
----
-
-###  Variables
+### Feature columns
 
 ```text
 SRI, SleepMidpoint, RA, IV, IVm, IS, ISm,
-M10, M10o, L5, L5o,
-ADAT, CoG, FSoD,
-kRA, kAR, LRI,
-M10olight, L5olight
-PeriodActivity, QPActivity,
-PeriodLight, QPLight,
+M10, M10o, L5, L5o, ADAT, CoG, FSoD,
+kRA, kAR, LRI, M10olight, L5olight,
+PeriodActivity, QPActivity, PeriodLight, QPLight,
 PeriodTemperature, QPTemperature
 ```
 
----
+### Encoding rules
 
-##  Example Dataset
+- Binary variables must be encoded as `0 = No / Female`, `1 = Yes / Male`
+- Column names must match exactly
+- Actigraphy files for notebook 2 should follow the naming pattern: `*_LogTAT_conferido.txt`
 
-### Columns
+### Sample rows
 
-```text
-Participant, Sex, Age, PLR, Diabetes status, SRI, SleepMidpoint, RA, IV, IVm, IS, ISm, M10, M10o, L5, L5o, ADAT, CoG, FSoD, kRA, kAR, LRI, M10olight, L5olight, PeriodActivity, QPActivity, PeriodLight, QPLight, PeriodTemperature, QPTemperature, Light Perception
+```csv
+Participant,Sex,Age,PLR,Diabetes status,SRI,SleepMidpoint,RA,...,Light Perception
+P01F45R0,1,45,1,0,42.59,1567,0.852,...,1
+P02F34R0,1,34,1,0,15.24,1551,0.803,...,1
 ```
 
 ---
 
-### Sample Rows
+## 🚀 Getting Started
 
-```text
-P01F45R0,1,45,1,0,42.58599722029186,1567,0.8516305355296401,0.7459553654401433,0.4143180933784019,0.604094656473627,0.6692002854857269,2999.867780191023,450,240.3766666666667,1490,949.2453870340346,51.13217102941918,0.0936318257449705,0.1935977798185335,0.0227495154509179,69.8828,437,1441,1440,21.640384564431,1440,6.832480203412753,1445,30.1695482745072,1440,1440,1
+### Option A — Run in Google Colab (no setup required)
 
-P02F34R0,1,34,1,0,15.23871527777779,1551,0.8025988707845458,0.6601915396691904,0.451798077181202,0.609662772808506,0.4894042339742607,2678.469168130317,320,293.3169696969697,1460,967.066796817624,47.0231929078461,0.1082034992184743,0.1344632422555327,0.0258771561673868,65.3255,416,1442,1440,9.003007524486954,1440,8.7239032508254,1440,25.26899551484653,1440,1440,1
+Click the badge above or open notebook 3 directly:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Pugliane/nonparametric-actigraphy-clustering/blob/main/nonparametric_actigraphy_clustering.ipynb)
+
+### Option B — Run locally
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/Pugliane/nonparametric-actigraphy-clustering.git
+cd nonparametric-actigraphy-clustering
+```
+
+#### 2. Create and activate a virtual environment
+
+```bash
+python -m venv venv
+
+# macOS / Linux
+source venv/bin/activate
+
+# Windows
+venv\Scripts\activate
+```
+
+#### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+#### 4. Launch Jupyter and run in order
+
+```bash
+jupyter notebook
+```
+
+Open the notebooks in sequence: **Notebook 1 → Notebook 2 → Notebook 3**.
+
+---
+
+## 📦 Dependencies
+
+### Core scientific computing
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `numpy` | 1.26.4 | Numerical computing |
+| `pandas` | 2.2.2 | Data wrangling and Excel/CSV I/O |
+| `scipy` | 1.11.4 | Statistical tests (Shapiro–Wilk, Levene, Mann–Whitney U) |
+| `statsmodels` | 0.14.1 | GLMs, OLS regression with HC3 robust standard errors |
+| `openpyxl` | latest | Excel file export |
+
+### Machine learning & explainability
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `scikit-learn` | 1.6.1 | PCA, KMeans, silhouette scoring, Random Forest classifier |
+| `shap` | 0.44.1 | SHAP feature importance for cluster characterisation |
+| `joblib` | latest | Parallel computation |
+| `numba` | 0.59.1 | JIT compilation (SHAP dependency) |
+
+### Actigraphy analysis
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `pyActigraphy` | 1.2.1 | Actigraphy file parsing; nonparametric metric computation (IS, IV, RA, M10, L5, SRI, kRA, kAR, LRI, CoG, FSoD, QP, Period) |
+
+### Visualisation
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `matplotlib` | 3.8.2 | Base plotting; publication-ready figure export |
+| `seaborn` | 0.13.2 | Statistical visualisation (violin plots, correlation matrices) |
+| `plotly` | 5.24.1 | Interactive figures |
+
+### Geospatial & environmental
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `geopandas` | latest | Geospatial data processing |
+| `geobr` | latest | Official Brazilian spatial datasets (IBGE) |
+| `astral` | latest | Sunrise/sunset and photoperiod calculation by coordinates |
+| `requests` | latest | NASA POWER API access for temperature/radiation data |
+| `adjustText` | latest | Non-overlapping label placement in maps |
+
+### Utilities
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `tqdm` | latest | Progress bars |
+| `Pillow` | latest | Image processing |
+| `python-docx` | 1.1.2 | Word document export |
+| `pytz` | latest | Timezone handling |
+| `ipykernel` | 6.29.5 | Jupyter kernel support |
+
+See [`requirements.txt`](./requirements.txt) for pinned versions.
+
+---
+
+## 🔧 Customising the Pipeline
+
+You can adapt the pipeline to your own actigraphy dataset:
+
+- **Add or remove features** — edit the variables list in the settings block at the top of notebook 3
+- **Change the clustering algorithm** — swap KMeans for DBSCAN, hierarchical, or GMM
+- **Adjust multicollinearity thresholds** — the default Pearson r > 0.85 and VIF > 5.0 cutoffs can be modified in the preprocessing section
+- **Change the PCA variance threshold** — default is ≥80% cumulative variance
+- **Update file paths** — set your data directory and filenames at the top of each notebook
+- **Adjust off-wrist masking** — provide your own mask database CSV for notebook 2
+
+---
+
+## 📄 Citation
+
+If you use this pipeline in your research, please cite both the software and the paper:
+
+**Software:**
+```bibtex
+@software{pugliane_2026_nonparametric,
+  author    = {Pugliane},
+  title     = {Pugliane/nonparametric-actigraphy-clustering: Initial release},
+  year      = {2026},
+  publisher = {Zenodo},
+  version   = {v1.0},
+  doi       = {10.5281/zenodo.18922404},
+  url       = {https://doi.org/10.5281/zenodo.18922404}
+}
+```
+
+**Paper:**
+```bibtex
+@article{pugliane_2026_lowlatitude,
+  author  = {Pugliane, Karen C. and França, Lucas G. S. and Leocadio-Miguel, Mario and Araújo, John F.},
+  title   = {Low-latitude environmental regularity sustains non-photic entrainment in blind adults},
+  journal = {bioRxiv},
+  year    = {2026},
+  doi     = {10.64898/2026.03.19.712663},
+  url     = {https://doi.org/10.64898/2026.03.19.712663}
+}
 ```
 
 ---
 
-##  Important Notes
+## 👥 Authors
 
-* Binary variables must be encoded as:
+| Role | Names | Affiliation |
+|------|-------|-------------|
+| Analysis & Development | Karen C. Pugliane | Graduate Program in Psychobiology, UFRN, Brazil |
+| Principal Investigators | Lucas G. S. França | Northumbria University, UK; King's College London, UK |
+| | Mario Leocadio-Miguel | Northumbria University, UK |
+| | John F. Araújo | UFRN, Brazil; Federal University of Delta do Parnaíba, Brazil |
 
-  * `0 = No`
-  * `1 = Yes`
-
-* Column names must match exactly those expected by the script.
-
-* Additional variables can be included if needed.
-
-* If you modify the dataset structure, you **must update the settings block in the script accordingly**.
+Correspondence: lucas.franca@northumbria.ac.uk
 
 ---
 
-##  Customization
+## 🤖 Related Tools
 
-You can adapt the pipeline to your dataset by:
+This pipeline was developed alongside:
 
-* Adding new variables
-* Removing unused columns
-* Renaming variables
+- 🌙 [**Sleep Diaries**](https://github.com/circadia-bio/SleepDiaries) — an open-source React Native sleep diary app for consensus-based sleep data collection (iOS, Android, web)
+- 🔬 [**circadia-bio**](https://github.com/circadia-bio) — the Circadia Lab GitHub organisation
 
-Just make sure to update the corresponding configuration/settings block in the script.
+---
 
+## 📄 Licence
 
+Released under the [MIT License](./LICENSE).
+
+Copyright © Pugliane, França, Leocadio-Miguel & Araújo
