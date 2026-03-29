@@ -146,7 +146,7 @@ Participant, Sex, Age, PLR, Diabetes status, Light Perception
 
 ---
 
-###  Circadian Variables
+###  Variables
 
 ```text
 SRI, SleepMidpoint, RA, IV, IVm, IS, ISm,
@@ -154,13 +154,6 @@ M10, M10o, L5, L5o,
 ADAT, CoG, FSoD,
 kRA, kAR, LRI,
 M10olight, L5olight
-```
-
----
-
-###  Environmental Variables (Optional)
-
-```text
 PeriodActivity, QPActivity,
 PeriodLight, QPLight,
 PeriodTemperature, QPTemperature
@@ -188,7 +181,7 @@ P02F34R0,1,34,1,0,15.23871527777779,1551,0.8025988707845458,0.6601915396691904,0
 
 ---
 
-## ⚠️ Important Notes
+##  Important Notes
 
 * Binary variables must be encoded as:
 
@@ -203,7 +196,7 @@ P02F34R0,1,34,1,0,15.23871527777779,1551,0.8025988707845458,0.6601915396691904,0
 
 ---
 
-## 🔧 Customization
+##  Customization
 
 You can adapt the pipeline to your dataset by:
 
